@@ -29,6 +29,9 @@
 % you need to redefine PlantUMLJobname to fix
 \def\PlantUMLJobname{\jobname}
 
+% support multiple uml's
+\newcounter{puml}
+
 \ExplSyntaxOn
 \keys_define:nn { plantuml } {
   output .choices:nn = {
@@ -73,12 +76,13 @@
     }
   \fi
   \NewDocumentEnvironment{plantuml}{}{%
-    \VerbatimOut{\PlantUMLJobname-plantuml.txt}}
+    \addtocounter{puml}{1}
+    \VerbatimOut{\PlantUMLJobname-\thepuml-plantuml.txt}}
   {%
     \endVerbatimOut
     \ifluatex
       \directlua{
-        local jobname=\luastring{\PlantUMLJobname}
+        local jobname=\luastring{\PlantUMLJobname-\thepuml}
         local plantUmlMode=\luastring{\PlantUmlMode}
         require("plantuml.lua")
         convertPlantUmlToTikz(jobname, plantUmlMode)
@@ -90,10 +94,10 @@
     \fi
     \ifthenelse{\equal{\PlantUmlMode}{latex}}{
       \begin{adjustbox}{max width=\linewidth}
-        \input{\PlantUMLJobname-plantuml.latex}
+        \input{\PlantUMLJobname-\thepuml-plantuml.latex}
       \end{adjustbox}
     }{
-      \includegraphics[width=\maxwidth{\textwidth}]{\PlantUMLJobname-plantuml.\PlantUmlMode}
+      \includegraphics[width=\maxwidth{\textwidth}]{\PlantUMLJobname-\thepuml-plantuml.\PlantUmlMode}
     }
   }
 \or
